@@ -8,6 +8,7 @@ Resources:
 - [GIN Index has O(N^2) complexity for array overlap operator?](https://stackoverflow.com/a/70852000/261061)
 - [btree_gist — GiST operator classes with B-tree behavior](https://www.postgresql.org/docs/16/btree-gist.html)
 - [intarray — manipulate arrays of integers](https://www.postgresql.org/docs/16/intarray.html)
+- French documentation [Indexation avancée](https://public.dalibo.com/exports/formation/manuels/modules/j5/j5.handout.html) by https://www.dalibo.com/
 
 
 ```sh
