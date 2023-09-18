@@ -5,6 +5,10 @@ Root issue context (in french): https://github.com/stephane-klein/backlog/issues
 Resources:
 
 - [GIN Indexes](https://www.postgresql.org/docs/15/gin.html)
+- [GIN Index has O(N^2) complexity for array overlap operator?](https://stackoverflow.com/a/70852000/261061)
+- [btree_gist — GiST operator classes with B-tree behavior](https://www.postgresql.org/docs/16/btree-gist.html)
+- [intarray — manipulate arrays of integers](https://www.postgresql.org/docs/16/intarray.html)
+
 
 ```sh
 $ docker compose up -d --wait
@@ -32,19 +36,28 @@ postgres@127:postgres> SELECT * FROM public.users WHERE ARRAY[2, 10] && space_id
 | 3  | user3    | [2, 3]    |
 | 4  | user4    | [2]       |
 +----+----------+-----------+
-postgres@127:postgres> SET ENABLE_SEQSCAN TO OFF;
 postgres@127:postgres> EXPLAIN ANALYZE SELECT * FROM public.users_gin WHERE ARRAY[2, 10] && space_ids;
-+-------------------------------------------------------------------------------------------------------------------------+
-| QUERY PLAN                                                                                                              |
-|-------------------------------------------------------------------------------------------------------------------------|
-| Bitmap Heap Scan on users_gin  (cost=17.27..27.43 rows=8 width=68) (actual time=0.021..0.023 rows=4 loops=1)            |
-|   Recheck Cond: ('{2,10}'::integer[] && space_ids)                                                                      |
-|   Heap Blocks: exact=1                                                                                                  |
-|   ->  Bitmap Index Scan on space_ids_index  (cost=0.00..17.27 rows=8 width=0) (actual time=0.014..0.014 rows=4 loops=1) |
-|         Index Cond: (space_ids && '{2,10}'::integer[])                                                                  |
-| Planning Time: 0.113 ms                                                                                                 |
-| Execution Time: 0.049 ms                                                                                                |
-+-------------------------------------------------------------------------------------------------------------------------+
-EXPLAIN 7
++-----------------------------------------------------------------------------------------------------+
+| QUERY PLAN                                                                                          |
+|-----------------------------------------------------------------------------------------------------|
+| Seq Scan on users_gin  (cost=0.00..20.62 rows=8 width=68) (actual time=0.015..0.019 rows=4 loops=1) |
+|   Filter: ('{2,10}'::integer[] && space_ids)                                                        |
+|   Rows Removed by Filter: 1                                                                         |
+| Planning Time: 0.094 ms                                                                             |
+| Execution Time: 0.033 ms                                                                            |
++-----------------------------------------------------------------------------------------------------+
+EXPLAIN 5
+Time: 0.009s
+postgres@127:postgres> EXPLAIN ANALYZE SELECT * FROM public.users_gin WHERE ARRAY[2, 10] && space_ids;
++-----------------------------------------------------------------------------------------------------+
+| QUERY PLAN                                                                                          |
+|-----------------------------------------------------------------------------------------------------|
+| Seq Scan on users_gin  (cost=0.00..20.62 rows=8 width=68) (actual time=0.013..0.016 rows=4 loops=1) |
+|   Filter: ('{2,10}'::integer[] && space_ids)                                                        |
+|   Rows Removed by Filter: 1                                                                         |
+| Planning Time: 0.127 ms                                                                             |
+| Execution Time: 0.029 ms                                                                            |
++-----------------------------------------------------------------------------------------------------+
+EXPLAIN 5
 Time: 0.008s
 ```
