@@ -1,4 +1,4 @@
-# POC PostgreSQL GIN Indexes
+# POC PostgreSQL GIN GIST Indexes
 
 Root issue context (in french): https://github.com/stephane-klein/backlog/issues/316
 
