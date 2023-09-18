@@ -1,5 +1,7 @@
 # POC PostgreSQL GIN Indexes
 
+Root issue context (in french): https://github.com/stephane-klein/backlog/issues/316
+
 Resources:
 
 - [GIN Indexes](https://www.postgresql.org/docs/15/gin.html)
